@@ -1,0 +1,125 @@
+@page {
+	margin: 20mm;
+}
+main {
+	width: calc(210mm - 2 * 20mm);
+}
+html {
+	background: #fff;
+	color: #000;
+	font: 11pt/1.25 sans-serif;
+}
+header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	position: relative;
+}
+h1 {
+	flex-basis: 100%;
+	margin: 0 0 1.5em;
+	font-weight: inherit;
+	font-size: 125%;
+	text-align: center;
+}
+header img {
+	position: absolute;
+	top: 0;
+	right: 2px;
+	width: 43mm;
+}
+table {
+	table-layout: fixed;
+	width: 100%;
+	margin: 7mm 0;
+	border-collapse: collapse;	
+}
+th,
+td {
+	border: 1px solid transparent;
+	border-color: #000 transparent;
+}
+th {
+	background: #90abdc;
+	border-top-color: transparent;
+	font-weight: inherit;
+	text-align: left;
+	vertical-align: top;
+}
+th[data-format="0:00"] {
+	width: 16mm;
+}
+th[data-format="0"] {
+	width: 10mm;
+}
+td[data-format],
+tfoot td {
+	padding-right: .5ex;
+	text-align: right;
+}
+header dl:last-child dd,
+tbody td[data-format="0:00"],
+tbody td.comment {
+	background: #ddebf7;
+}
+tfoot td {
+	padding-top: 3mm;
+}
+[colspan] {
+	border: 0;
+}
+tr[data-work="NO"] td {
+	background: #bfbfbf;
+}
+td.lunch-break[data-value="0"],
+tr[data-work="NO"] td[data-format="0:00"],
+tr[data-work="NO"] td.comment {
+	font-size: 0;
+}
+dt::after,
+[colspan]:not(:empty)::after {
+	content: ": "
+}
+dl,
+dd {
+	margin: 0;
+}
+header dl {
+	width: calc(32mm + 43mm + 2px);
+}
+header dt,
+header dd {
+	display: inline-block;
+	width: 32mm;
+}
+th:last-child,
+header dd {
+	width: 43mm;
+}
+header dl:last-child dd {
+	border-bottom: 1px solid #000;
+}
+header dl:last-child dd::after {
+	content: "\a0";
+}
+footer {
+	font-style: italic;
+	line-height: 1.5;
+	text-align: center;
+}
+footer dt,
+footer dd {
+	display: inline;
+}
+footer dt:first-child::after {
+	content: " ";
+}
+footer dd + dt::before {
+	content: "\a";
+	white-space: pre;
+}
+@media print {
+	aside {
+		display: none;
+	}
+}

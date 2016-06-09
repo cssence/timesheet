@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<title>TRINN timesheet</title>
+		<link rel="stylesheet" href="print.css">
+		<link rel="stylesheet" media="screen" href="screen.css">
+	</head>
+	<body>
+		<main>
+			<header>
+				<img src="https://trinn.consulting/img/logo.svg">
+				<h1>Arbeitszeitaufzeichnung</h1>
+				<dl>
+					<dt>Mitarbeiter</dt><dd data-field="employee"></dd>
+					<dt>Zeitraum</dt><dd data-field="period"></dd>
+				</dl>
+				<dl>
+					<dt>Überprüft durch</dt><dd></dd>
+					<dt>Überprüft am</dt><dd></dd>
+				</dl>
+			</header>
+			<table>
+				<thead>
+					<tr>
+						<th data-format="0">Tag</th>
+						<th data-format="0:00">Arbeits&shy;beginn</th>
+						<th data-format="0:00">Arbeits&shy;ende</th>
+						<th data-format="0:00">Pause von</th>
+						<th data-format="0:00">Pause bis</th>
+						<th data-format="0,00">Arbeitszeit exkl. Pause und ohne Überstunden</th>
+						<th data-format="0,00">Geleistete Überstunden</th>
+						<th>Kommentar</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="5">Summen</td>
+						<td data-field="total"></td>
+						<td>0,00</td>
+						<td colspan="1"></td>
+					</tr>
+				</tfoot>
+			</table>
+			<footer>
+				<dl>
+					<dt>Gleitzeitrahmen</dt><dd>von 6:30 bis 21:00 Uhr</dd>
+					<dt>Arbeitstage im Zeitraum</dt><dd data-field="days"></dd>
+					<dt>Arbeitsstunden im Zeitraum</dt><dd data-field="hours"></dd>
+				</dl>
+			</footer>
+		</main>
+		<aside>
+			<form method="GET" target=".">
+				<p>
+					<label for="employee">Employee</label>
+					<input type="text" id="employee" name="employee" value="Matthias Beitl">
+				</p>
+				<p>
+					<label for="month">Month</label>
+					<select id="month" name="month" size="1">
+						<option value="1">Jänner</option>
+						<option value="2">Februar</option>
+						<option value="3">März</option>
+						<option value="4">April</option>
+						<option value="5">Mai</option>
+						<option value="6">Juni</option>
+						<option value="7">Juli</option>
+						<option value="8">August</option>
+						<option value="9">September</option>
+						<option value="10">Oktober</option>
+						<option value="11">November</option>
+						<option value="12">Dezember</option>
+					</select>
+				</p>
+				<p>
+					<label for="year">Year</label>
+					<input type="number" id="year" name="year" value="2016">
+				</p>
+				<p>
+					<label for="clipboard">Data</label>
+					<textarea id="clipboard" name="clipboard"></textarea>
+				</p>
+				<p>
+					<button type="submit">Generate</button>
+				</p>
+			</form>
+		</aside>
+		<script src="submit.js"></script>
+	</body>
+</html>
