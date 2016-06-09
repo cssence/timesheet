@@ -1,11 +1,22 @@
 @page {
 	margin: 20mm;
 }
+html {
+	box-sizing: border-box;
+	cursor: default;
+}
+*,
+*::before,
+*::after {
+	box-sizing: inherit;
+	cursor: inherit;
+}
+body {
+	margin: 0;
+	padding: 0;
+}
 main {
 	width: calc(210mm - 2 * 20mm);
-}
-html {
-	background: #fff;
 	color: #000;
 	font: 11pt/1.25 sans-serif;
 }
@@ -22,45 +33,50 @@ h1 {
 	font-size: 125%;
 	text-align: center;
 }
-header img {
+header svg {
 	position: absolute;
 	top: 0;
-	right: 2px;
-	width: 43mm;
+	right: 0;
 }
 table {
 	table-layout: fixed;
 	width: 100%;
-	margin: 7mm 0;
+	margin: 7mm 0 7mm 1px;
 	border-collapse: collapse;	
 }
-th,
-td {
-	border: 1px solid transparent;
-	border-color: #000 transparent;
+thead tr {
+	background: #90abdc;
 }
 th {
-	background: #90abdc;
-	border-top-color: transparent;
+	padding: .5ex;
+	padding-right: 0;
 	font-weight: inherit;
 	text-align: left;
 	vertical-align: top;
+}
+th small {
+	display: block;
+	font-size: 50%;
 }
 th[data-format="0:00"] {
 	width: 16mm;
 }
 th[data-format="0"] {
-	width: 10mm;
+	width: 8mm;
 }
 td[data-format],
 tfoot td {
 	padding-right: .5ex;
 	text-align: right;
 }
-header dl:last-child dd,
+header dd:empty,
 tbody td[data-format="0:00"],
 tbody td.comment {
-	background: #ddebf7;
+	background: rgba(0,211,229,.1);
+}
+td.comment {
+	overflow: hidden;
+	white-space: nowrap;
 }
 tfoot td {
 	padding-top: 3mm;
@@ -69,7 +85,7 @@ tfoot td {
 	border: 0;
 }
 tr[data-work="NO"] td {
-	background: #bfbfbf;
+	background: #ccc;
 }
 td.lunch-break[data-value="0"],
 tr[data-work="NO"] td[data-format="0:00"],
@@ -85,18 +101,28 @@ dd {
 	margin: 0;
 }
 header dl {
-	width: calc(32mm + 43mm + 2px);
+	display: flex;
+	flex-wrap: wrap;
+	width: calc(32mm + 43mm);
 }
 header dt,
 header dd {
-	display: inline-block;
 	width: 32mm;
 }
 th:last-child,
 header dd {
 	width: 43mm;
 }
-header dl:last-child dd {
+header dd {
+	border-bottom: 1px solid transparent;
+}
+@media screen {
+	header dd {
+		border-bottom-color: #000;
+	}
+}
+tr,
+header dd:empty {
 	border-bottom: 1px solid #000;
 }
 header dl:last-child dd::after {
@@ -119,7 +145,7 @@ footer dd + dt::before {
 	white-space: pre;
 }
 @media print {
-	aside {
+	.screen {
 		display: none;
-	}
+	}	
 }

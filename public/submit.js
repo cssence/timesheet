@@ -1,31 +1,14 @@
 (function (window, document) {
 	"use strict";
-	var now = new Date();
-	document.querySelector("#year").value = now.getFullYear();
-	document.querySelector("#month").value = (now.getMonth() + (now.getDate() > 19 ? 1 : 0)) || 12;
-	document.querySelector("form").addEventListener("submit", function (event) {
-		event.preventDefault();
+	var renderSheet = function (ts) {
 		var HOURS_PER_DAY = 7.7;
-		var COL_WORK_FROM = 0;
-		var COL_WORK_TO = 1;
-		var COL_BREAK_FROM = 2;
-		var COL_BREAK_TO = 3;
-		var COL_COMMENT = 4;
 		var workDays = 0;
 		var workedTotal = 0;
-		var data = document.querySelector("#clipboard").value.replace(/\r/g, "").split("\n");
-		var month = parseInt(document.querySelector("#month").value, 10);
-		var year = parseInt(document.querySelector("#year").value, 10);
-		var start = 1;
-		var end = new Date(year, month, 0).getDate();
-		document.querySelector("[data-field=employee]").textContent = document.querySelector("#employee").value;
-		document.querySelector("[data-field=period]").textContent = document.querySelector("#month option:checked").textContent + " " + year;
+		var data = JSON.parse(window.sessionStorage.getItem("db"))[ts.getFullYear()][ts.getMonth()+1];
 		var pretty = function (value, precision) {
-			precision = precision || 2;
-			value = "00" + Math.round(value * Math.pow(10, precision));
-			return parseInt(value.slice(0, value.length - precision), 10) + "," + value.slice(-precision);
+			return value.toFixed(precision || 2).replace(".", ",");
 		};
-		var parseTime = function (value, pretty) {
+		var parseTime = function (value) {
 			value = value || "0:00";
 			value = value.split(":");
 			value = parseInt(value[0], 10) + (parseInt(value[1], 10) / 60);
@@ -48,31 +31,123 @@
 			return cell;
 		};
 		document.querySelector("tbody").innerHTML = "";
-		for (var date = start; date <= end; ++date) {
+		do {
 			var row = document.createElement("tr");
-			var rowData = (data[date - 1] || "").split("\t");
-			var ts = new Date(year, month - 1, date);
-			//row.setAttribute("data-day", ts.toGMTString().slice(0, 3).toUpperCase());
-			if (ts.getDay() % 6 && "Feiertag" !== rowData[COL_COMMENT]) {
+			var rowData = data[ts.getDate()] || {};
+			if (ts.getDay() % 6 && "Feiertag" !== rowData.comment) {
 				workDays++;
 				row.setAttribute("data-work", "YES");
 			} else {
 				row.setAttribute("data-work", "NO");
 			}
-			var worked = parseTime(rowData[COL_WORK_TO]) - parseTime(rowData[COL_WORK_FROM]) - (parseTime(rowData[COL_BREAK_TO]) - parseTime(rowData[COL_BREAK_FROM]));
+			var worked = parseTime(rowData.to) - parseTime(rowData.from) - (parseTime(rowData.breakTo) - parseTime(rowData.breakFrom));
 			workedTotal += worked;
-			row.appendChild(makeCell(0, date));
-			row.appendChild(makeCell(1, rowData[COL_WORK_FROM]));
-			row.appendChild(makeCell(2, rowData[COL_WORK_TO]));
-			row.appendChild(makeCell(3, {text: rowData[COL_BREAK_FROM], className: "lunch-break"}));
-			row.appendChild(makeCell(4, {text: rowData[COL_BREAK_TO], className: "lunch-break"}));
+			row.appendChild(makeCell(0, ts.getDate()));
+			row.appendChild(makeCell(1, rowData.from));
+			row.appendChild(makeCell(2, rowData.to));
+			row.appendChild(makeCell(3, {text: rowData.breakFrom, className: "lunch-break"}));
+			row.appendChild(makeCell(4, {text: rowData.breakTo, className: "lunch-break"}));
 			row.appendChild(makeCell(5, pretty(worked)));
 			row.appendChild(makeCell(6));
-			row.appendChild(makeCell(7, {text: rowData[COL_COMMENT], className: "comment"}));
+			row.appendChild(makeCell(7, {text: rowData.comment, className: "comment"}));
 			document.querySelector("tbody").appendChild(row);
-		}
+			ts.setDate(ts.getDate() + 1);
+		} while (ts.getDate() !== 1);
 		document.querySelector("[data-field=total]").textContent = pretty(workedTotal);
 		document.querySelector("[data-field=days]").textContent = workDays;
 		document.querySelector("[data-field=hours]").textContent = pretty(workDays * HOURS_PER_DAY, 1);
+	};
+	var refreshData = function (event) {
+		var data = window.sessionStorage.getItem("db");
+		if (!data) {
+			return;
+		}
+		data = JSON.parse(data);
+		var container = document.querySelector("[data-field=period]");
+		container.innerHTML = "";
+		var select = document.createElement("select");
+		Object.keys(data).forEach(function(year) {
+			Object.keys(data[year]).forEach(function(month) {
+				var period = new Date(year, month, 1);
+				var option = document.createElement("option");
+				option.value = period.toISOString().slice(0, 7);
+				option.textContent = ["Jänner", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"][period.getMonth() - 1] + " " + period.getFullYear();
+				select.appendChild(option);
+			});
+		});
+		select.setAttribute("id", "period");
+		select.setAttribute("name", "period");
+		select.classList.add("screen");
+		select.lastChild.selected = true;
+		container.appendChild(select);
+		var label = document.createElement("label");
+		label.setAttribute("for", "period");
+		container.appendChild(label);
+		var refresh = function (event) {
+			var selected = event.target.querySelector(":checked");
+			document.querySelector("label[for=period]").textContent = selected.textContent;
+			renderSheet(new Date(selected.value));
+		};
+		select.addEventListener("change", refresh);
+		refresh({target: select});
+	};
+	var readFile = function (event) {
+		var implemented = {
+			"day;from;to;break;breakTo;comment": {DELIMITER: ";", COL: {DATE: 0, FROM: 1, TO: 2, BREAK_FROM: 3, BREAK_TO: 4, COMMENT: 5}}
+		};
+		var csv = this.result.replace(/\r/g, "").split("\n");
+		var csvFormat = implemented[csv[0]];
+		if (!csvFormat) {
+			alert("Unrecognized file format.");
+			return;
+		}
+		var assign = function assign (node, keyChain, value) {
+			if (keyChain.length > 1) {
+				node[keyChain[0]] = node[keyChain[0]] || {};
+				assign(node[keyChain[0]], keyChain.slice(1), value);
+			} else {
+				node[keyChain[0]] = value;
+			}
+		};
+		var data = {};
+		csv.slice(1).forEach(function (row) {
+			var cols = row.split(csvFormat.DELIMITER);
+			var dt = cols[csvFormat.COL.DATE];
+			if (dt) {
+				dt = new Date(dt);
+				assign(data, [dt.getFullYear(), dt.getMonth() + 1, dt.getDate()], {
+					from: cols[csvFormat.COL.FROM] || undefined,
+					to: cols[csvFormat.COL.TO] || undefined,
+					breakFrom: cols[csvFormat.COL.BREAK_FROM] || undefined,
+					breakTo: cols[csvFormat.COL.BREAK_TO] || undefined,
+					comment: cols[csvFormat.COL.COMMENT] || undefined
+				});
+			}
+		});
+		window.sessionStorage.setItem("db", JSON.stringify(data));
+		refreshData();
+	};
+	document.querySelector("#print").addEventListener("click", function (event) {
+		window.print();
 	});
+	document.querySelector("#file").addEventListener("change", function (event) {
+		var files = event.target.files;
+		var file = files[0];
+		var reader = new FileReader();
+		reader.onload = readFile;
+		reader.readAsText(file);
+	});
+	[].forEach.call(document.querySelectorAll("[data-field][contenteditable]"), function (item) {
+		var key = item.getAttribute("data-field");
+		var value = window.localStorage.getItem(key);
+		if (value !== null) {
+			item.textContent = value;
+		}
+		item.addEventListener("blur", function (event) {
+			var key = event.target.getAttribute("data-field");
+			var value = event.target.textContent;
+			window.localStorage.setItem(key, value);
+		});
+	});
+	refreshData();
 }(window, document));
