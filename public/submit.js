@@ -14,20 +14,16 @@
 			value = parseInt(value[0], 10) + (parseInt(value[1], 10) / 60);
 			return value;
 		};
-		var makeCell = function (index, set) {
+		var makeCell = function (index, text) {
 			var header = document.querySelectorAll("th")[index];
-			set = typeof set === "object" ? set : {text: set};
-			set.className = header.className + (set.className ? " " + set.className : "");
-			set.format = header.getAttribute("data-format");
+			var format = header.getAttribute("data-format");
 			var cell = document.createElement("td");
-			cell.textContent = set.text || set.format || "";
-			if (set.className) {
-				cell.className = set.className;
-			}
-			if (set.format) {
-				cell.setAttribute("data-format", set.format);
-				if (set.format === "0:00") {
-					cell.setAttribute("data-value", parseTime(set.text));
+			cell.textContent = text || format || "";
+			cell.className = header.className;
+			if (format) {
+				cell.setAttribute("data-format", format);
+				if (format === "0:00") {
+					cell.setAttribute("data-value", parseTime(text));
 				}
 			}
 			return cell;

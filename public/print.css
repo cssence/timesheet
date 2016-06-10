@@ -13,7 +13,6 @@ html {
 }
 body {
 	margin: 0;
-	padding: 0;
 }
 main {
 	width: calc(210mm - 2 * 20mm);
@@ -81,9 +80,6 @@ td.comment {
 tfoot td {
 	padding-top: 3mm;
 }
-[colspan] {
-	border: 0;
-}
 tr[data-work="0.5"] td {
 	background-image: repeating-linear-gradient(75deg, transparent, transparent 2mm, #ccc 2mm, #ccc 4mm);
 }
@@ -96,7 +92,7 @@ tr[data-work="0"] td.comment {
 	font-size: 0;
 }
 dt::after,
-[colspan]:not(:empty)::after {
+[colspan]::after {
 	content: ": "
 }
 dl,
