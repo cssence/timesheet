@@ -15,8 +15,10 @@
 			return value;
 		};
 		var makeCell = function (index, set) {
+			var header = document.querySelectorAll("th")[index];
 			set = typeof set === "object" ? set : {text: set};
-			set.format = document.querySelectorAll("th")[index].getAttribute("data-format");
+			set.className = header.className + (set.className ? " " + set.className : "");
+			set.format = header.getAttribute("data-format");
 			var cell = document.createElement("td");
 			cell.textContent = set.text || set.format || "";
 			if (set.className) {
@@ -36,20 +38,20 @@
 			var rowData = data[ts.getDate()] || {};
 			if (ts.getDay() % 6 && "Feiertag" !== rowData.comment) {
 				workDays++;
-				row.setAttribute("data-work", "YES");
+				row.setAttribute("data-work", "1");
 			} else {
-				row.setAttribute("data-work", "NO");
+				row.setAttribute("data-work", "0");
 			}
 			var worked = parseTime(rowData.to) - parseTime(rowData.from) - (parseTime(rowData.breakTo) - parseTime(rowData.breakFrom));
 			workedTotal += worked;
 			row.appendChild(makeCell(0, ts.getDate()));
 			row.appendChild(makeCell(1, rowData.from));
 			row.appendChild(makeCell(2, rowData.to));
-			row.appendChild(makeCell(3, {text: rowData.breakFrom, className: "lunch-break"}));
-			row.appendChild(makeCell(4, {text: rowData.breakTo, className: "lunch-break"}));
+			row.appendChild(makeCell(3, rowData.breakFrom));
+			row.appendChild(makeCell(4, rowData.breakTo));
 			row.appendChild(makeCell(5, pretty(worked)));
 			row.appendChild(makeCell(6));
-			row.appendChild(makeCell(7, {text: rowData.comment, className: "comment"}));
+			row.appendChild(makeCell(7, rowData.comment));
 			document.querySelector("tbody").appendChild(row);
 			ts.setDate(ts.getDate() + 1);
 		} while (ts.getDate() !== 1);

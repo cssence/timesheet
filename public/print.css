@@ -84,12 +84,15 @@ tfoot td {
 [colspan] {
 	border: 0;
 }
-tr[data-work="NO"] td {
+tr[data-work="0.5"] td {
+	background-image: repeating-linear-gradient(75deg, transparent, transparent 2mm, #ccc 2mm, #ccc 4mm);
+}
+tr[data-work="0"] td {
 	background: #ccc;
 }
-td.lunch-break[data-value="0"],
-tr[data-work="NO"] td[data-format="0:00"],
-tr[data-work="NO"] td.comment {
+td.break[data-value="0"],
+tr[data-work="0"] td[data-format="0:00"],
+tr[data-work="0"] td.comment {
 	font-size: 0;
 }
 dt::after,
@@ -103,15 +106,15 @@ dd {
 header dl {
 	display: flex;
 	flex-wrap: wrap;
-	width: calc(32mm + 43mm);
+	width: calc(32mm + 45mm);
 }
 header dt,
 header dd {
 	width: 32mm;
 }
-th:last-child,
+th.comment,
 header dd {
-	width: 43mm;
+	width: 45mm;
 }
 header dd {
 	border-bottom: 1px solid transparent;
