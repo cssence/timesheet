@@ -75,6 +75,7 @@ tbody td.comment {
 }
 td.comment {
 	overflow: hidden;
+	font-size: 75%;
 	white-space: nowrap;
 }
 tfoot td {
